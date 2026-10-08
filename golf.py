@@ -8,13 +8,30 @@ def main(stdscr):
     allowbounce = True
     floorxshift = random.randint(1,100)
     def floor(a):
-        return int(round(math.floor(curses.LINES - 5 - 3 * math.sin((a+floorxshift) / 15))))
+        a = a + 2
+        if a > 10:
+            return int(round(math.floor(curses.LINES - 5 - 3 * math.sin((a+floorxshift) / 15))))
+        else:
+            return curses.LINES - 9
+    def floortype(a):
+        a = a + 2
+        if floor(a) > curses.LINES - 9:
+            b = math.sin((a+floorxshift)/5)
+            if b <= .7:
+                return ("=")
+            elif b <= .9:
+                return ("s")
+            elif b <= 1:
+                return ("w")
+        else:
+            return ("=")
 
     def floorslope(a):
+        a = a + 2
         # See? I guess calculus was useful...
         return -0.2 * math.cos((a + floorxshift) / 15)
 
-    holex = random.randint(50,400)
+    holex = random.randint(50,500)
     holey = floor(holex)
     # Clear the screen
     win = False
@@ -50,7 +67,16 @@ def main(stdscr):
         nonlocal bally, ballx, camx, ballyvel, ballxvel
         if bally == floor(ballx + 3) - 1:
             if (abs(ballx - holex)) >= 10:
-                ballxvel = ballxvel * .9
+                if floortype(ballx) == "=":
+                    ballxvel = ballxvel * .9
+                elif floortype(ballx) == "s":
+                    ballxvel = ballxvel * .1
+                    ballyvel = ballyvel * .8
+                elif floortype(ballx) == "w":
+                    ballyvel = 0
+                    ballxvel = 0
+                    ballx, bally = 0, floor(3) - 1
+                    fired = 0
             elif (abs(ballx - holex)) >= 5:
                 ballxvel = ballxvel * .7
             else:
@@ -77,6 +103,7 @@ def main(stdscr):
         if not fired:
             ballyvel = 0
             ballxvel = 0
+
     while True:
         while not win:
             stdscr.clear()
@@ -86,7 +113,12 @@ def main(stdscr):
 
             for x in range(curses.COLS):
                 y = floor(x + camx)
-                stdscr.addch(y, x, "=")
+                stdscr.addch(y, x, floortype(x + camx))
+
+                for groundy in range(y + 1, curses.LINES):
+                    if groundy < curses.LINES - 1 or x < curses.COLS - 1:
+                        stdscr.addch(groundy, x, "-")
+                
             if 0 <= math.floor(bally) < curses.LINES:
                 stdscr.addstr(math.floor(bally), 2, "•-Ball")
             if ballx < holex:
