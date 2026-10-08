@@ -36,7 +36,7 @@ def main(stdscr):
         stdscr.clear()
         a = curses.COLS
         flr = "=" * (a - 1)
-        ballx, bally = 0, floor(1) - 1
+        ballx, bally = 0, floor(3) - 1
         ballyvel = 0
         ballxvel = 0
 
@@ -46,7 +46,7 @@ def main(stdscr):
         global fired
         nonlocal allowbounce
         nonlocal bally, ballx, camx, ballyvel, ballxvel
-        if bally == floor(ballx) - 1:
+        if bally == floor(ballx + 3) - 1:
             if (abs(ballx - holex)) >= 10:
                 ballxvel = ballxvel * .9
             elif (abs(ballx - holex)) >= 5:
@@ -62,15 +62,15 @@ def main(stdscr):
         ballyvel += -.1
 
         bally = bally - ballyvel
-        if bally >= floor(ballx) - 1:
-            if abs(floorslope(ballx)) >= .025:
-                ballxvel += floorslope(ballx) * 0.3
+        if bally >= floor(ballx + 3) - 1:
+            if abs(floorslope(ballx + 3)) >= .025:
+                ballxvel += floorslope(ballx + 3) * 0.3
             if allowbounce:
                 ballyvel = 0 - (ballyvel * .65 )
             if ballyvel < .1:
                 allowbounce = False  
                 ballyvel = 0
-            bally = floor(ballx) - 1
+            bally = floor(ballx + 3) - 1
 
         if not fired:
             ballyvel = 0
@@ -115,14 +115,16 @@ def main(stdscr):
             
             key = stdscr.getch()
             if not fired:
+                ymax = 3
+                xmax = 4
                 if abs(ballx - holex) <= 5:
                     win = True
                     time.sleep(2)
                 if curses.KEY_UP == key:
                     ballyvel += .05
                     ballyvel = round(ballyvel, 2)
-                    if ballyvel > 2:
-                        ballyvel = 2
+                    if ballyvel > 3:
+                        ballyvel = 3
 
                 if curses.KEY_DOWN == key:
                     ballyvel -= .05
@@ -133,14 +135,14 @@ def main(stdscr):
                 if curses.KEY_LEFT == key:
                     ballxvel -= .05
                     ballxvel = round(ballxvel, 2)
-                    if ballxvel < -3:
-                        ballxvel = -3
+                    if ballxvel < -xmax:
+                        ballxvel = -xmax
 
                 if curses.KEY_RIGHT == key:
                     ballxvel += .05
                     ballxvel = round(ballxvel, 2)
-                    if ballxvel > 3:
-                        ballxvel = 3
+                    if ballxvel > xmax:
+                        ballxvel = xmax
 
                 if key in (10, 13, curses.KEY_ENTER):
                     fired = True
