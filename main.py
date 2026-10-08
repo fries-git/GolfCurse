@@ -14,7 +14,7 @@ def main(stdscr):
         # See? I guess calculus was useful...
         return -0.2 * math.cos((a + floorxshift) / 15)
 
-    holex = random.randint(50,200)
+    holex = random.randint(50,400)
     holey = floor(holex)
     # Clear the screen
     win = False
@@ -25,9 +25,10 @@ def main(stdscr):
     ballx, bally = 0, floor(1) - 1
     ballyvel = 0
     ballxvel = 0
+    putts = 0
     
     def init():
-        nonlocal holex, holey, win, camx, ballx, bally, ballyvel, ballxvel, allowbounce
+        nonlocal holex, holey, win, camx, ballx, bally, ballyvel, ballxvel, allowbounce, putts
         holex = random.randint(50,200)
         holey = floor(holex)
         # Clear the screen
@@ -39,6 +40,7 @@ def main(stdscr):
         ballx, bally = 0, floor(3) - 1
         ballyvel = 0
         ballxvel = 0
+        putts = 0
 
     init()
 
@@ -85,8 +87,8 @@ def main(stdscr):
             for x in range(curses.COLS):
                 y = floor(x + camx)
                 stdscr.addch(y, x, "=")
-
-            stdscr.addstr(math.floor(bally), 2, "•-Ball")
+            if 0 <= math.floor(bally) < curses.LINES:
+                stdscr.addstr(math.floor(bally), 2, "•-Ball")
             if ballx < holex:
                 stdscr.addstr(2, 0, "Hole is on the right.")
             else:
@@ -147,6 +149,7 @@ def main(stdscr):
                 if key in (10, 13, curses.KEY_ENTER):
                     fired = True
                     allowbounce = True
+                    putts += 1
 
             stdscr.refresh()
             if fired:
@@ -156,7 +159,7 @@ def main(stdscr):
 
         while win:
             stdscr.clear()
-            stdscr.addstr(0, 0, "You Win! YIPPEE!!!")
+            stdscr.addstr(0, 0, f"You Win! It took {putts} putts on a {holex} distance hole!")
             stdscr.addstr(1, 0, "Press Enter to play again!")
             stdscr.refresh()
 
