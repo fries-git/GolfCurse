@@ -13,7 +13,7 @@ def main(stdscr):
     def floorslope(a):
         # See? I guess calculus was useful...
         return -0.2 * math.cos((a + floorxshift) / 15)
-    
+
     holex = random.randint(50,200)
     holey = floor(holex)
     # Clear the screen
@@ -25,6 +25,22 @@ def main(stdscr):
     ballx, bally = 0, floor(1) - 1
     ballyvel = 0
     ballxvel = 0
+    
+    def init():
+        nonlocal holex, holey, win, camx, ballx, bally, ballyvel, ballxvel, allowbounce
+        holex = random.randint(50,200)
+        holey = floor(holex)
+        # Clear the screen
+        win = False
+        camx = 0
+        stdscr.clear()
+        a = curses.COLS
+        flr = "=" * (a - 1)
+        ballx, bally = 0, floor(1) - 1
+        ballyvel = 0
+        ballxvel = 0
+
+    init()
 
     def moveball():
         global fired
@@ -33,8 +49,10 @@ def main(stdscr):
         if bally == floor(ballx) - 1:
             if (abs(ballx - holex)) >= 10:
                 ballxvel = ballxvel * .9
-            else:
+            elif (abs(ballx - holex)) >= 5:
                 ballxvel = ballxvel * .7
+            else:
+                ballxvel = ballxvel * .05
             if abs(ballxvel) < .075 and abs(ballyvel) < .1:
                 fired = False
             
@@ -57,88 +75,96 @@ def main(stdscr):
         if not fired:
             ballyvel = 0
             ballxvel = 0
+    while True:
+        while not win:
+            stdscr.clear()
 
-    while not win:
-        stdscr.clear()
+            stdscr.nodelay(True)
+            stdscr.keypad(True)
 
-        stdscr.nodelay(True)
-        stdscr.keypad(True)
+            for x in range(curses.COLS):
+                y = floor(x + camx)
+                stdscr.addch(y, x, "=")
 
-        for x in range(curses.COLS):
-            y = floor(x + camx)
-            stdscr.addch(y, x, "=")
-
-        stdscr.addstr(math.floor(bally), 2, "•-Ball")
-        if ballx < holex:
-            stdscr.addstr(2, 0, "Hole is on the right.")
-        else:
-            stdscr.addstr(2, 0, "Hole is on the left.")
-
-        stdscr.addstr(0, 0, f"Arrow keys to adjust shot X/Y power X: {ballxvel} Y: {ballyvel}")
-        computex = math.floor(holex-camx)
-        if computex >= 0 and computex < curses.COLS:
-            stdscr.addstr(holey, computex, "H")
-            stdscr.addstr(holey - 1, computex, "|")
-            stdscr.addstr(holey - 2, computex, "|")
-            stdscr.addstr(holey - 3, computex, "|")
-            if computex - 1 >= 0 and computex - 1 < curses.COLS:
-                stdscr.addstr(holey - 3, computex - 1, "<")
-        else:
-            if computex < 0:
-                stdscr.addstr(holey-1, 0, "-Hole")
+            stdscr.addstr(math.floor(bally), 2, "•-Ball")
+            if ballx < holex:
+                stdscr.addstr(2, 0, "Hole is on the right.")
             else:
-                stdscr.addstr(holey-1, curses.COLS-5, "Hole-")
+                stdscr.addstr(2, 0, "Hole is on the left.")
 
-        if fired:
-            moveball()
+            stdscr.addstr(0, 0, f"Arrow keys to adjust shot X/Y power X: {ballxvel} Y: {ballyvel}")
+            computex = math.floor(holex-camx)
+            if computex >= 0 and computex < curses.COLS:
+                stdscr.addstr(holey, computex, "H")
+                if holex-ballx >= 25:
+                    stdscr.addstr(holey - 1, computex, "|")
+                    stdscr.addstr(holey - 2, computex, "|")
+                    stdscr.addstr(holey - 3, computex, "|")
+                    if computex - 1 >= 0 and computex - 1 < curses.COLS:
+                        stdscr.addstr(holey - 3, computex - 1, "<")
+            else:
+                if computex < 0:
+                    stdscr.addstr(holey-1, 0, "-Hole")
+                else:
+                    stdscr.addstr(holey-1, curses.COLS-5, "Hole-")
 
-        stdscr.addstr(1, 0, f"Distance to hole: {str(int(abs(ballx - holex)))}")
-        
-        key = stdscr.getch()
-        if not fired:
-            if abs(ballx - holex) <= 5:
-                win = True
-                time.sleep(2)
-            if curses.KEY_UP == key:
-                ballyvel += .05
-                ballyvel = round(ballyvel, 2)
-                if ballyvel > 2:
-                    ballyvel = 2
+            if fired:
+                moveball()
 
-            if curses.KEY_DOWN == key:
-                ballyvel -= .05
-                ballyvel = round(ballyvel, 2)
-                if ballyvel < 0:
-                    ballyvel = 0
+            stdscr.addstr(1, 0, f"Distance to hole: {str(int(abs(ballx - holex)))}")
+            
+            key = stdscr.getch()
+            if not fired:
+                if abs(ballx - holex) <= 5:
+                    win = True
+                    time.sleep(2)
+                if curses.KEY_UP == key:
+                    ballyvel += .05
+                    ballyvel = round(ballyvel, 2)
+                    if ballyvel > 2:
+                        ballyvel = 2
 
-            if curses.KEY_LEFT == key:
-                ballxvel -= .05
-                ballxvel = round(ballxvel, 2)
-                if ballxvel < -3:
-                    ballxvel = -3
+                if curses.KEY_DOWN == key:
+                    ballyvel -= .05
+                    ballyvel = round(ballyvel, 2)
+                    if ballyvel < 0:
+                        ballyvel = 0
 
-            if curses.KEY_RIGHT == key:
-                ballxvel += .05
-                ballxvel = round(ballxvel, 2)
-                if ballxvel > 3:
-                    ballxvel = 3
+                if curses.KEY_LEFT == key:
+                    ballxvel -= .05
+                    ballxvel = round(ballxvel, 2)
+                    if ballxvel < -3:
+                        ballxvel = -3
 
-            if key in (10, 13, curses.KEY_ENTER):
-                fired = True
-                allowbounce = True
+                if curses.KEY_RIGHT == key:
+                    ballxvel += .05
+                    ballxvel = round(ballxvel, 2)
+                    if ballxvel > 3:
+                        ballxvel = 3
 
-        stdscr.refresh()
-        if fired:
-            time.sleep(.1)
-        else:
-            time.sleep(0)
+                if key in (10, 13, curses.KEY_ENTER):
+                    fired = True
+                    allowbounce = True
+
+            stdscr.refresh()
+            if fired:
+                time.sleep(.1)
+            else:
+                time.sleep(0)
+
         while win:
             stdscr.clear()
             stdscr.addstr(0, 0, "You Win! YIPPEE!!!")
+            stdscr.addstr(1, 0, "Press Enter to play again!")
             stdscr.refresh()
+
+            stdscr.nodelay(False)
+            key = stdscr.getch()
+
             if key in (10, 13, curses.KEY_ENTER):
-                while key in (10, 13, curses.KEY_ENTER):
-                    time.sleep(0)
                 win = False
+                stdscr.nodelay(True)
+            
+            init()
 
 curses.wrapper(main)
