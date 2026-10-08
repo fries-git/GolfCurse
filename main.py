@@ -31,7 +31,10 @@ def main(stdscr):
         nonlocal allowbounce
         nonlocal bally, ballx, camx, ballyvel, ballxvel
         if bally == floor(ballx) - 1:
-            ballxvel = ballxvel * .85
+            if (abs(ballx - holex)) >= 30:
+                ballxvel = ballxvel * .85
+            else:
+                ballxvel = ballxvel * .75
             if abs(ballxvel) < .1 and abs(ballyvel) < .1:
                 fired = False
             
