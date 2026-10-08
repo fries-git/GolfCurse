@@ -5,6 +5,7 @@ import random
 def main(stdscr):
     global fired
     fired = False
+    allowbounce = True
     floorxshift = random.randint(1,100)
     def floor(a):
         return int(round(math.floor(curses.LINES - 5 - 3 * math.sin((a+floorxshift) / 15))))
@@ -27,9 +28,10 @@ def main(stdscr):
 
     def moveball():
         global fired
+        nonlocal allowbounce
         nonlocal bally, ballx, camx, ballyvel, ballxvel
         if bally == floor(ballx) - 1:
-            ballxvel = ballxvel * .9
+            ballxvel = ballxvel * .85
             if abs(ballxvel) < .1 and abs(ballyvel) < .1:
                 fired = False
             
@@ -40,9 +42,12 @@ def main(stdscr):
 
         bally = bally - ballyvel
         if bally >= floor(ballx) - 1:
-            ballxvel += floorslope(ballx) * 0.2
-            ballyvel = 0 - (ballyvel * .65 )
-            if ballyvel < .1:   
+            if abs(floorslope(ballx)) >= .2:
+                ballxvel += floorslope(ballx) * 0.2
+            if allowbounce:
+                ballyvel = 0 - (ballyvel * .65 )
+            if ballyvel < .1:
+                allowbounce = False  
                 ballyvel = 0
             bally = floor(ballx) - 1
 
@@ -61,7 +66,7 @@ def main(stdscr):
             y = floor(x + camx)
             stdscr.addch(y, x, "=")
 
-        stdscr.addstr(math.floor(bally), 1, "•")
+        stdscr.addstr(math.floor(bally), 0, "•")
 
         stdscr.addstr(0, 0, f"Arrow keys to adjust shot X/Y power X: {ballxvel} Y: {ballyvel}")
         computex = math.floor(holex-camx)
@@ -80,7 +85,7 @@ def main(stdscr):
         
         key = stdscr.getch()
         if not fired:
-            if abs(ballx - holex) < 5:
+            if abs(ballx - holex) <= 10:
                 win = True
             if curses.KEY_UP == key:
                 ballyvel += .05
@@ -97,24 +102,27 @@ def main(stdscr):
             if curses.KEY_LEFT == key:
                 ballxvel -= .05
                 ballxvel = round(ballxvel, 2)
-                if ballxvel < -2:
-                    ballxvel = -2
+                if ballxvel < -3:
+                    ballxvel = -3
 
             if curses.KEY_RIGHT == key:
                 ballxvel += .05
                 ballxvel = round(ballxvel, 2)
-                if ballxvel > 2:
-                    ballxvel = 2
+                if ballxvel > 3:
+                    ballxvel = 3
 
             if key in (10, 13, curses.KEY_ENTER):
                 fired = True
+                allowbounce = True
 
         stdscr.refresh()
         if fired:
             time.sleep(.1)
         else:
             time.sleep(0)
-
-        stdscr.addstr(0, 0, "You Win! YIPPEE!!!")
+        while win:
+            stdscr.clear()
+            stdscr.addstr(0, 0, "You Win! YIPPEE!!!")
+            stdscr.refresh()
 
 curses.wrapper(main)
