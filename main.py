@@ -14,7 +14,7 @@ def main(stdscr):
         # See? I guess calculus was useful...
         return -0.2 * math.cos((a + floorxshift) / 15)
     
-    holex = 100 
+    holex = random.randint(50,200)
     holey = floor(holex)
     # Clear the screen
     win = False
@@ -31,11 +31,11 @@ def main(stdscr):
         nonlocal allowbounce
         nonlocal bally, ballx, camx, ballyvel, ballxvel
         if bally == floor(ballx) - 1:
-            if (abs(ballx - holex)) >= 30:
-                ballxvel = ballxvel * .85
+            if (abs(ballx - holex)) >= 10:
+                ballxvel = ballxvel * .9
             else:
-                ballxvel = ballxvel * .75
-            if abs(ballxvel) < .1 and abs(ballyvel) < .1:
+                ballxvel = ballxvel * .7
+            if abs(ballxvel) < .075 and abs(ballyvel) < .1:
                 fired = False
             
         ballx = ballx + ballxvel
@@ -45,8 +45,8 @@ def main(stdscr):
 
         bally = bally - ballyvel
         if bally >= floor(ballx) - 1:
-            if abs(floorslope(ballx)) >= .2:
-                ballxvel += floorslope(ballx) * 0.2
+            if abs(floorslope(ballx)) >= .025:
+                ballxvel += floorslope(ballx) * 0.3
             if allowbounce:
                 ballyvel = 0 - (ballyvel * .65 )
             if ballyvel < .1:
@@ -58,7 +58,6 @@ def main(stdscr):
             ballyvel = 0
             ballxvel = 0
 
-
     while not win:
         stdscr.clear()
 
@@ -69,7 +68,11 @@ def main(stdscr):
             y = floor(x + camx)
             stdscr.addch(y, x, "=")
 
-        stdscr.addstr(math.floor(bally), 0, "•")
+        stdscr.addstr(math.floor(bally), 2, "•-Ball")
+        if ballx < holex:
+            stdscr.addstr(2, 0, "Hole is on the right.")
+        else:
+            stdscr.addstr(2, 0, "Hole is on the left.")
 
         stdscr.addstr(0, 0, f"Arrow keys to adjust shot X/Y power X: {ballxvel} Y: {ballyvel}")
         computex = math.floor(holex-camx)
@@ -80,6 +83,11 @@ def main(stdscr):
             stdscr.addstr(holey - 3, computex, "|")
             if computex - 1 >= 0 and computex - 1 < curses.COLS:
                 stdscr.addstr(holey - 3, computex - 1, "<")
+        else:
+            if computex < 0:
+                stdscr.addstr(holey-1, 0, "-Hole")
+            else:
+                stdscr.addstr(holey-1, curses.COLS-5, "Hole-")
 
         if fired:
             moveball()
@@ -88,8 +96,9 @@ def main(stdscr):
         
         key = stdscr.getch()
         if not fired:
-            if abs(ballx - holex) <= 10:
+            if abs(ballx - holex) <= 5:
                 win = True
+                time.sleep(2)
             if curses.KEY_UP == key:
                 ballyvel += .05
                 ballyvel = round(ballyvel, 2)
@@ -127,5 +136,9 @@ def main(stdscr):
             stdscr.clear()
             stdscr.addstr(0, 0, "You Win! YIPPEE!!!")
             stdscr.refresh()
+            if key in (10, 13, curses.KEY_ENTER):
+                while key in (10, 13, curses.KEY_ENTER):
+                    time.sleep(0)
+                win = False
 
 curses.wrapper(main)
