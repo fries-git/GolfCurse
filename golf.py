@@ -154,6 +154,7 @@ def main(stdscr):
                 if abs(ballx - holex) <= 5:
                     win = True
                     time.sleep(2)
+                    
                 if curses.KEY_UP == key:
                     ballyvel += .05
                     ballyvel = round(ballyvel, 2)
