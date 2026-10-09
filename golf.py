@@ -28,8 +28,8 @@ def main(stdscr):
 
     def floorslope(a):
         a = a + 2
-        # See? I guess calculus was useful...
         return -0.2 * math.cos((a + floorxshift) / 15)
+        # See? I guess calculus was useful...
 
     holex = random.randint(50,500)
     holey = floor(holex)

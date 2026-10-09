@@ -102,6 +102,6 @@ def main(stdscr):
             curses.doupdate()
 
             movesnake()
-            time.sleep(0.05)
+            time.sleep(0.1)
         
 curses.wrapper(main)
