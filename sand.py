@@ -14,33 +14,39 @@ def draw(stdscr, grid):
     for y, row in enumerate(grid):
         for x, cell in enumerate(row):
             if cell == 1:
-                stdscr.addch(y + 1, x + 1, "S")
+                try:
+                    stdscr.addch(y + 1, x + 1, "S")
+                except:
+                    pass
 
 def movesand(grid, gx, gy):
     for y in range(len(grid) - 2, -1, -1):
         for x, cell in enumerate(grid[y]):
             if cell == 1:
                 rand = random.randint(0,1)
-                if rand == 1:
-                    if grid[y + gy][x] == 0:
-                        grid[y + gy][x] = 1
-                        grid[y][x] = 0
-                    elif grid[y + gy][x + 1] == 0:
-                        grid[y + gy][x + 1] = 1
-                        grid[y][x] = 0
-                    elif grid[y + gy][x - 1] == 0:
-                        grid[y + gy][x - 1] = 1
-                        grid[y][x] = 0
-                else:
-                    if grid[y + gy][x] == 0:
-                        grid[y + gy][x] = 1
-                        grid[y][x] = 0
-                    elif grid[y + gy][x - 1] == 0:
-                        grid[y + gy][x - 1] = 1
-                        grid[y][x] = 0
-                    elif grid[y + gy][x + 1] == 0:
-                        grid[y + gy][x + 1] = 1
-                        grid[y][x] = 0
+                try:
+                    if rand == 1:
+                        if grid[y + gy][x] == 0:
+                            grid[y + gy][x] = 1
+                            grid[y][x] = 0
+                        elif grid[y + gy][x + 1] == 0:
+                            grid[y + gy][x + 1] = 1
+                            grid[y][x] = 0
+                        elif grid[y + gy][x - 1] == 0:
+                            grid[y + gy][x - 1] = 1
+                            grid[y][x] = 0
+                    else:
+                        if grid[y + gy][x] == 0:
+                            grid[y + gy][x] = 1
+                            grid[y][x] = 0
+                        elif grid[y + gy][x - 1] == 0:
+                            grid[y + gy][x - 1] = 1
+                            grid[y][x] = 0
+                        elif grid[y + gy][x + 1] == 0:
+                            grid[y + gy][x + 1] = 1
+                            grid[y][x] = 0
+                except:
+                    pass
 
 
 def main(stdscr):
@@ -52,9 +58,11 @@ def main(stdscr):
         height, width = stdscr.getmaxyx()
         if key in (curses.KEY_ENTER, 10, 13):
             grid[0][len(grid[0]) // 2] = 1
+            grid[0][(len(grid[0]) // 2) + 1] = 1
+            grid[0][(len(grid[0]) // 2) - 1] = 1
         else:
             gforcex, gforcey = 0,1
-            time.sleep(0.05)
+            #time.sleep(0.05)
         stdscr.clear()
         movesand(grid, gforcex, gforcey)
         draw(stdscr, grid)
