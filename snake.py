@@ -94,7 +94,7 @@ def main(stdscr):
             addchar(snakey, snakex, "H")
 
             for coord in snakecoords:
-                addchar(coord[1], coord[0], "o")
+                addchar(coord[1], coord[0], "+")
 
             addchar(1, 1, str(length))
             addchar(appley, applex, "a")

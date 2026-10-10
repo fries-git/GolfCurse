@@ -8,26 +8,26 @@ def main(stdscr):
     allowbounce = True
     floorxshift = random.randint(1,100)
     def floor(a):
-        a = a + 2
+        a = a - 4
         if a > 10:
             return int(round(math.floor(curses.LINES - 5 - 3 * math.sin((a+floorxshift) / 15))))
         else:
             return curses.LINES - 9
+        
     def floortype(a):
-        a = a + 2
         if floor(a) > curses.LINES - 9:
-            b = math.sin((a+floorxshift)/5)
-            if b <= .7:
-                return ("=")
-            elif b <= .9:
-                return ("s")
-            elif b <= 1:
-                return ("w")
+            b = ((math.sin(a * .1 + floorxshift) + .9) * 20)
+            if b < -0.15:
+                return "w"
+            elif b < 0.4:
+                return "s"
+            else:
+                return "="
         else:
-            return ("=")
+            return "="
 
     def floorslope(a):
-        a = a + 2
+        a = a - 4
         return -0.2 * math.cos((a + floorxshift) / 15)
         # See? I guess calculus was useful...
 
@@ -46,7 +46,7 @@ def main(stdscr):
     
     def init():
         nonlocal holex, holey, win, camx, ballx, bally, ballyvel, ballxvel, allowbounce, putts
-        holex = random.randint(50,200)
+        holex = random.randint(50,500)
         holey = floor(holex)
         # Clear the screen
         win = False
@@ -87,7 +87,7 @@ def main(stdscr):
         ballx = ballx + ballxvel
         camx = ballx
         
-        ballyvel += -.1
+        ballyvel += -.095
 
         bally = bally - ballyvel
         if bally >= floor(ballx + 3) - 1:

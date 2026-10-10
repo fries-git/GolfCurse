@@ -1,7 +1,7 @@
 import curses
 
-def draw(stdscr):
-    stdscr.addstr(0, 0, "a")
+def draw(stdscr, x, y, char):
+    stdscr.addstr(x, y, char)
 
 def main(stdscr):
     while True:
